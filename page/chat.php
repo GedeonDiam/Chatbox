@@ -1,5 +1,4 @@
 <?php
-$id = mysqli_connect("localhost", "root", "", "chatbox");
 if(isset($_POST["bouton"])){
     $pseudo = $_POST['pseudo'];
     $message = $_POST['message'];
