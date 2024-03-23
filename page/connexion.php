@@ -91,7 +91,7 @@ button:hover {
    
         if(mysqli_num_rows($result) > 0) {
             $row = mysqli_fetch_assoc($result);
-            $_SESSION["id_users"] = $row["id_users"];
+            $_SESSION["id_users"] = $row["id_user"];
             $_SESSION["email"]=$row["email"];
       header("location: index.php?page=chat");
         } else {

@@ -17,6 +17,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-search"></i></span>
                     </div>
+                    <a href="index.php?page=deconnexion">Quitter</a>
                     <input type="text" class="form-control" placeholder="Search...">
                 </div>
                 <ul class="list-unstyled chat-list mt-2 mb-0">
@@ -58,24 +59,37 @@
                                 <small>Last seen: 2 hours ago</small>
                             </div>
                         </div>
-                        <div class="col-lg-6 hidden-sm text-right">
-                            <a href="javascript:void(0);" class="btn btn-outline-secondary"><i class="fa fa-camera"></i></a>
-                            <a href="javascript:void(0);" class="btn btn-outline-primary"><i class="fa fa-image"></i></a>
-                            <a href="javascript:void(0);" class="btn btn-outline-info"><i class="fa fa-cogs"></i></a>
-                            <a href="javascript:void(0);" class="btn btn-outline-warning"><i class="fa fa-question"></i></a>
-                        </div>
+                       
                     </div>
                 </div>
                 <div class="chat-history" style= "height: 80vh;   overflow-y: scroll;" >
                     <ul class="m-b-0">
-                        <li class="clearfix">
-                            <div class="message-data ">
-                             
-                                <div class="message my-message">Project has been already finished and I have results to show you.</div>
+                        <?php
+                        $id_user_recu=$_GET["id_user"] || "";
+                         $resultat = mysqli_query($connexion, 'select * from messages where id_user_recu='.$id_user_recu.' and id_user_envoi='.$_SESSION['id_users']);
 
-                            </div>
-                            <div class="message other-message float-right"> Hi Aiden, how are you? How is the project coming along? </div>
-                        </li>
+                         while($ligne = mysqli_fetch_assoc($resultat)){
+                            $contenu = $ligne["contenu"];
+
+                            if($ligne["type_message"]=="Message envoyé"){
+                                echo " <li class='clearfix'>
+                                <div class='message other-message float-right'> $contenu </div>
+                                </li>";
+                                
+                            }else{
+                                echo " <li class='clearfix'>
+                                <div class='message-data '>
+                                 
+                                    <div class='message my-message'>$contenu</div>
+    
+                                </div>
+                               
+                            </li> ";
+                            }
+                        }
+                        ?>
+                       
+                        
                     </ul>
                 </div>
                 <div class="chat-message clearfix">
