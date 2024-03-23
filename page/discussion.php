@@ -68,6 +68,7 @@
                 </div>
                 <div class="chat-history" style= "height: 80vh;   overflow-y: scroll;" >
                     <ul class="m-b-0">
+                        
                         <li class="clearfix">
                             <div class="message-data ">
                              
