@@ -5,14 +5,23 @@
         $nom = $_POST['nom'];
         $prenom = $_POST['prenom'];
         $mail = $_POST['email'];
-        $tel = $_POST['tel'];
         $mdp = $_POST['mdp'];
         //je lance la requête
-        $req = "INSERT INTO users (nom,prenom,email,tel,mdp) VALUES ('$nom', '$prenom', '$mail', '$tel', '$mdp')";
+        $req = "INSERT INTO users (nom,prenom,email,password) VALUES ('$nom', '$prenom', '$mail', '$mdp')";
         //j'exécute la requête
         $execute = mysqli_query($connexion, $req);
-            header("location: index.php?page=qcm");
+        $req = ("SELECT * FROM users WHERE email = '$mail' AND password = '$mdp'");
+        $result = mysqli_query($connexion, $req);
+   
+        if(mysqli_num_rows($result) > 0) {
+            $row = mysqli_fetch_assoc($result);
+            $_SESSION["id_users"] = $row["id_user"];
+            $_SESSION["email"]=$row["email"];
+            $_SESSION["nom"]=$row["nom"];
+            $_SESSION["prenom"]=$row["prenom"];
+      header("location: index.php?page=chat");
    }
+}
 ?>
 
 
@@ -92,7 +101,7 @@ button:hover {
             </div>
             <div class="form-group">
                 <label for="email">Adresse email</label>
-                <input type="email" id="mail" name="mail" required>
+                <input type="email" id="email" name="email" required>
             </div>
           
             <div class="form-group">

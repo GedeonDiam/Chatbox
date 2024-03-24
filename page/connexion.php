@@ -91,8 +91,10 @@ button:hover {
    
         if(mysqli_num_rows($result) > 0) {
             $row = mysqli_fetch_assoc($result);
-            $_SESSION["id_users"] = $row["id_users"];
+            $_SESSION["id_users"] = $row["id_user"];
             $_SESSION["email"]=$row["email"];
+            $_SESSION["nom"]=$row["nom"];
+            $_SESSION["prenom"]=$row["prenom"];
       header("location: index.php?page=chat");
         } else {
             // L'utilisateur n'est pas authentifié
