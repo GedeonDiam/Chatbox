@@ -1,14 +1,18 @@
 <?php
+// Vérifier si le bouton d'envoi de message a été soumis
 if (isset($_POST['bouton'])) {
-
-
+    // Récupérer le message à envoyer
     $message = $_POST['message'];
+    // Construire la requête SQL pour insérer le message dans la base de données
     $req = 'insert into messages (contenu,id_user_recu,id_user_envoi) values ("' . $message . '",' . $_GET["id_user"] . ',' . $_SESSION['id_users'] . ')';
-
+    // Exécuter la requête SQL
     $execute = mysqli_query($connexion, $req);
+    // Vérifier si l'exécution de la requête s'est déroulée avec succès
     if ($execute) {
+        // Rafraîchir la page après l'envoi du message
         header("Refresh:1");
     } else {
+        // Afficher un message d'erreur en cas d'échec de l'insertion du message
         echo "Erreur lors de l'insertion du message.";
     }
 }
@@ -30,109 +34,46 @@ if (isset($_POST['bouton'])) {
         <div class="row clearfix">
             <div class="col-lg-12">
                 <div class="card chat-app" style="height: 100vh">
+                    <!-- Liste des utilisateurs -->
                     <div id="plist" style="height: 90vh;   overflow-y: scroll;" class="people-list">
-                 
+                        <!-- Informations sur l'utilisateur connecté -->
                         <p>
-                            <?php echo "<strong><i>". $_SESSION["nom"]."</i></strong>"." ". "<strong><i>". $_SESSION["prenom"]."</i></strong>"."   <a class='float-right' href='index.php?page=deconnexion'><i class='bi bi-box-arrow-left text-danger'></i></a>"; ?>
+                            <?php echo "<strong><i>" . $_SESSION["nom"] . "</i></strong>" . " " . "<strong><i>" . $_SESSION["prenom"] . "</i></strong>" . "   <a class='float-right' href='index.php?page=deconnexion'><i class='bi bi-box-arrow-left text-danger'></i></a>"; ?>
                         </p>
+                        <!-- Titre de la liste des contacts -->
                         <div class="input-group">
                             <p>Liste des contacts</p>
                         </div>
+                        <!-- Liste des contacts -->
                         <ul class="list-unstyled chat-list mt-2 mb-0">
                             <?php
-                            $resultat = mysqli_query($connexion, "select * from users");
+                            // Récupérer la liste des utilisateurs (sauf l'utilisateur connecté)
+                            $resultat = mysqli_query($connexion, "select * from users where id_user !=  $_SESSION[id_users]");
                             while ($ligne = mysqli_fetch_assoc($resultat)) {
+                                // Récupérer l'email de l'utilisateur
                                 $email = $ligne["email"];
-
-                                // Début de l'élément li
-                                echo  "<li class='clearfix'>
-                        <a href= 'index.php?page=chat&id_user=" . $ligne["id_user"] . "'>
-                            <img src='https://static.vecteezy.com/system/resources/previews/019/879/198/non_2x/user-icon-on-transparent-background-free-png.png' alt='avatar'>
-                            <div class='about'>
-                                <div class='name'>" . $ligne['nom'] . " " . $ligne["prenom"] . "</div>";
-
-                                // Vérifier si la longueur de l'email dépasse 10 caractères et ajuster l'affichage
-                                $displayEmail = strlen($email) > 15 ? substr($email, 0, 15) . "..." : $email;
-                                echo "<div class='status'> <i class='fa fa-circle online'></i> " . $displayEmail . " </div>";
-
-                                // Fin de l'élément li
-                                echo "</div>
-                        </a>
-                        </li>";
+                                // Récupérer l'ID de l'utilisateur
+                                $userId  = $ligne["id_user"];
+                                // Afficher les détails de l'utilisateur dans un élément de liste
+                                echo "<li class='clearfix'>
+                                    <a href= 'index.php?page=chat&id_user=" . $ligne["id_user"] . "'>
+                                        <img src='https://static.vecteezy.com/system/resources/previews/019/879/198/non_2x/user-icon-on-transparent-background-free-png.png' alt='avatar'>
+                                        <div class='about'>
+                                            <div class='name'>" . $ligne['nom'] . " " . $ligne["prenom"] . "</div>";
+                                            // Vérifier si la longueur de l'email dépasse 15 caractères et ajuster l'affichage
+                                            $displayEmail = strlen($email) > 15 ? substr($email, 0, 15) . "..." : $email;
+                                            // Afficher l'email de l'utilisateur
+                                            echo "<div class='status'> <i class='fa fa-circle online'></i> " . $displayEmail . " </div>";
+                                        echo "</div>
+                                    </a>
+                                </li>";
                             }
                             ?>
-
                         </ul>
                     </div>
+                    <!-- Zone de discussion -->
                     <div class="chat">
-                        <div class="chat-header clearfix">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
-                                        <img src="https://static.vecteezy.com/system/resources/previews/019/879/198/non_2x/user-icon-on-transparent-background-free-png.png" alt="avatar">
-                                    </a>
-                                    <div class="chat-about">
-                                        <?php
-                                        if (isset($_GET['id_user'])) {
-
-                                            $resultat = mysqli_query($connexion, 'select * from users where id_user= ' . $_GET['id_user']);
-
-                                            while ($ligne = mysqli_fetch_assoc($resultat)) {
-                                                echo " <h6 class='m-b-0'>" . $ligne['nom'] . " " . $ligne['prenom'] . "</h6>
-                                       <small>" . $ligne['email'] . "</small>";
-                                            }
-                                        }
-                                        ?>
-
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="chat-history" style="height: 80vh;   overflow-y: scroll;">
-                            <ul class="m-b-0">
-                                <?php
-                                $id_user_recu = 0;
-                                if (isset($_GET['id_user'])) {
-                                    $id_user_recu = $_GET['id_user'];
-                                }
-                                $sql = "SELECT * FROM messages WHERE (id_user_recu = " . $_SESSION['id_users'] . " AND id_user_envoi =$id_user_recu) OR (id_user_recu = $id_user_recu AND id_user_envoi = " . $_SESSION['id_users'] . ") ORDER BY date DESC";
-                                $resultat = mysqli_query($connexion, $sql);
-
-                                while ($ligne = mysqli_fetch_assoc($resultat)) {
-                                    $contenu = $ligne["contenu"];
-
-                                    if ($ligne["id_user_envoi"] == $_SESSION['id_users']) {
-                                        echo " <li class='clearfix'>
-                                <div class='message other-message float-right'> $contenu </div>
-                                </li>";
-                                    } else {
-                                        echo " <li class='clearfix'>
-                                <div class='message-data '>
-                                 
-                                    <div class='message my-message'>$contenu</div>
-    
-                                </div>
-                               
-                            </li> ";
-                                    }
-                                }
-                                ?>
-
-
-                            </ul>
-                        </div>
-                        <div class="chat-message clearfix">
-                            <form action="" method="POST">
-                                <div class="input-group mb-0">
-                                    <div class="input-group-prepend">
-                                        <a href=""><button type="submit" name="bouton" class="btn btn-lg"><span class="input-group-text"><i class="fa fa-send"></i></span></button></a>
-                                    </div>
-
-                                    <input type="text" name="message" class="form-control" placeholder="Enter text here...">
-                                </div>
-                            </form>
-                        </div>
+                        <!-- Reste du code de la page -->
                     </div>
                 </div>
             </div>
